@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import sys
+import logging as logger
+from src.config import *
+from src.utils import *
+
+
+# Script parse vcf files and extract useful information
+# EXAMPLES: cat      sv-results.vcf    | python3 vcf_utils args
+#           gzip -dc sv-results.vcf.gz | python3 vcf_utils args
+
+
+def main():
+    args, main_help = get_arguments()
+    command = args.command
+
+    try:
+        AS_DEV = args.as_dev
+    except AttributeError:
+        AS_DEV = False
+    if AS_DEV:
+        logger.basicConfig(format='vcf_parser::%(process)d:%(levelname)s> %(message)s', level=logger.DEBUG, force=True)
+    else:
+        logger.basicConfig(format='vcf_parser::%(levelname)s> %(message)s', level=logger.INFO, force=True)
+
+    # Version
+    if command == "version" or "--version":
+        the_version()
+    # Sniffles2: Default
+    elif command == "sv":
+        sniffles2_single(args, sys.stdin)
+    # Sniffles2: population
+    elif command == "population":
+        sniffles2_population(args, sys.stdin)
+    # Sniffles2: cancer
+    elif command == "cancer":
+        sniffles2_cancer(args, sys.stdin, logger)
+    # SURVIVOR
+    elif command == "survivor":
+        survivor_parse(args, sys.stdin, logger)
+    # help x2
+    elif command == "help":
+        print(main_help)
+    else:
+        print(main_help)
+
+
+# main
+if __name__ == '__main__':
+    main()
