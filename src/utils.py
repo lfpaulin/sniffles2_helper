@@ -36,8 +36,21 @@ def sniffles2_single(args, stdin, printout=False):
                                   end="\n") if abs(vcf_entry.SVLEN) >= args.minsize else ""
 
 
-def sniffles2_population():
-    pass
+def sniffles2_population(args, stdin, logger):
+
+    def parse_pop_vcf():
+        # header for tsv
+        for line in stdin:
+            # skip comments
+            if line.startswith("#") and not line.startswith("##"):
+                vcf_header = VCFHeader(line.rstrip("\n"))
+            elif not line.startswith("#"):
+                vcf_entry = VCFLineSVPopulation(line.rstrip("\n"), vcf_header.SAMPLES)
+                # TODO: print parsed file
+            else:
+                pass
+
+    parse_pop_vcf()
 
 
 def sniffles2_cancer():
@@ -51,4 +64,3 @@ def survivor_parse():
 # misc
 def is_sv_translocation(the_svtype):
     return the_svtype == "BND" or the_svtype == "TRA"
-

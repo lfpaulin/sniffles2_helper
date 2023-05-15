@@ -24,14 +24,14 @@ def main():
         logger.basicConfig(format='vcf_parser::%(levelname)s> %(message)s', level=logger.INFO, force=True)
 
     # Version
-    if command == "version" or "--version":
+    if command == "version" or command == "--version":
         the_version()
     # Sniffles2: Default
     elif command == "sv":
-        sniffles2_single(args, sys.stdin)
+        sniffles2_single(args, sys.stdin, logger)
     # Sniffles2: population
     elif command == "population":
-        sniffles2_population(args, sys.stdin)
+        sniffles2_population(args, sys.stdin, logger)
     # Sniffles2: cancer
     elif command == "cancer":
         sniffles2_cancer(args, sys.stdin, logger)
