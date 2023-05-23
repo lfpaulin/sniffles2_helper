@@ -46,7 +46,7 @@ def sniffles2_population(args, stdin, logger):
                 vcf_header = VCFHeader(line.rstrip("\n"))
             elif not line.startswith("#"):
                 vcf_entry = VCFLineSVPopulation(line.rstrip("\n"), vcf_header.SAMPLES)
-                # TODO: print parsed file
+                logger.info(f'{vcf_entry.svline}')
             else:
                 pass
 

@@ -1,5 +1,5 @@
 import logging as logger
-
+import numpy as np
 
 AS_DEV = True
 logger.basicConfig(level=logger.DEBUG) if AS_DEV else logger.basicConfig(level=logger.INFO)
@@ -225,7 +225,7 @@ class VCFLineSVPopulation(object):
                     elif info_key == "SUPP_VEC":
                         self.SUPP_VEC = info_val
                         self.SUPP_VEC_BOOL_LIST = [supp == "1" for supp in list(info_val)]
-                        self.N_SUPP_VEC = len(self.SUPP_VEC_BOOL_LIST)
+                        self.N_SUPP_VEC = sum([int(supp) for supp in list(info_val)])
                     else:
                         pass
 
@@ -251,7 +251,10 @@ class VCFLineSVPopulation(object):
                 else:
                     pass
             #AF
-            sample_gt.set_af(sample_gt.dv/(sample_gt.dv+sample_gt.dr))
+            if sample_gt.dv+sample_gt.dr > 0:
+                sample_gt.set_af(sample_gt.dv/(sample_gt.dv+sample_gt.dr))
+            else:
+                sample_gt.set_af(np.nan)
             self.samples_AF.append(sample_gt.af)
             # Mosaic
             sample_gt.set_mosaic(self.af_min_mosaic <= sample_gt.af <= self.af_max_mosaic)
