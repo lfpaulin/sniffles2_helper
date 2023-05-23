@@ -211,7 +211,7 @@ class VCFLineSVPopulation(object):
                     elif info_key == "SUPPORT":
                         self.SUPPORT = int(info_val)
                     elif info_key == "COVERAGE":
-                        self.COVERAGE = [int(x) for x in info_val.split(",")]
+                        self.COVERAGE = [int(x) if x is not None else 0 for x in info_val.split(",")]
                     elif info_key == "STRAND":
                         self.STRAND = info_val
                     elif info_key == "STDEV_LEN":
