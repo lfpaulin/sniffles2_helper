@@ -49,7 +49,10 @@ def get_arguments():
     subparser_genotypesv.add_argument('-f', '--filter', type=str, required=False, dest='filer_gt', default="",
                                       help='Removed genotypes from output, for multiple,need to be comma separated.' +
                                       '\nExample: -f 0/0,0/1, default = None')
-    subparser_genotypesv.add_argument('-!', '--dev', action='store_true', required=False, dest='as_dev', default=False, help='')
+    subparser_genotypesv.add_argument('-b', '--bed', action='store_true', required=False, dest='as_bed', default=False,
+                                      help='')
+    subparser_genotypesv.add_argument('-!', '--dev', action='store_true', required=False, dest='as_dev', default=False,
+                                      help='')
 
     # Sniffles2 population
     snf2pop_help = "Perform analysis on Sniffles2 population-merges"

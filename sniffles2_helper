@@ -28,7 +28,10 @@ def main():
         the_version()
     # Sniffles2: Default
     elif command == "sv":
-        sniffles2_single(args, sys.stdin, logger)
+        if args.as_bed:
+            sniffles2_single_bed(args, sys.stdin, logger)
+        else:
+            sniffles2_single(args, sys.stdin, logger)
     # Sniffles2: population
     elif command == "population":
         sniffles2_population(args, sys.stdin, logger)

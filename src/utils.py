@@ -36,6 +36,29 @@ def sniffles2_single(args, stdin, printout=False):
                                   end="\n") if abs(vcf_entry.SVLEN) >= args.minsize else ""
 
 
+def sniffles2_single_bed(args, stdin, printout=False):
+    # header
+    print(f'#CHROM\tSTART\tEND\tSAMPLE', end="\n") if printout else None
+    # results
+    for line in stdin:
+        # skip comments
+        if not line.startswith("#"):
+            vcf_entry = VCFLineSV(line.rstrip("\n"))
+            af = "{:0.3f}".format(vcf_entry.AF) if vcf_entry.AF != "NA" else "NA"
+            gt = vcf_entry.GENOTYPE
+            coverage = vcf_entry.DR+vcf_entry.DV
+            if (vcf_entry.DR+vcf_entry.DV) >= args.minsupp:
+                use_breakpoints = False  #abs(vcf_entry.SVLEN) > 10000
+                if use_breakpoints:
+                    print(f'{vcf_entry.CHROM}\t{vcf_entry.POS}\t{vcf_entry.POS+1}\t'
+                          f'{vcf_entry.SVTYPE}:{gt}:{coverage}:{af}:{vcf_entry.ID}:B', end="\n")
+                    print(f'{vcf_entry.CHROM}\t{vcf_entry.END-1}\t{vcf_entry.END}\t'
+                          f'{vcf_entry.SVTYPE}:{gt}:{coverage}:{af}:{vcf_entry.ID}:B', end="\n")
+                else:
+                    print(f'{vcf_entry.CHROM}\t{vcf_entry.POS}\t{vcf_entry.END}\t'
+                          f'{vcf_entry.SVTYPE}:{gt}:{coverage}:{af}:{vcf_entry.ID}', end="\n")
+
+
 def sniffles2_population(args, stdin, logger):
 
     def parse_pop_vcf():

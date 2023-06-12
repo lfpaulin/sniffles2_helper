@@ -84,7 +84,8 @@ class VCFLineSV(object):
                     self.SVLEN = info_val if info_key == "SVLEN" else self.SVLEN
                     self.END = int(info_val) if info_key == "END" else self.END
                     self.SUPPORT = int(info_val) if info_key == "SUPPORT" else self.SUPPORT
-                    self.COVERAGE = [int(x) for x in info_val.split(",")] if info_key == "COVERAGE" else self.COVERAGE
+                    self.COVERAGE = [int(x) if x != "None" else 0 for x in info_val.split(",")] \
+                        if info_key == "COVERAGE" else self.COVERAGE
                     self.STRAND = info_val if info_key == "STRAND" else self.STRAND
                     self.AF = float(info_val) if info_key == "AF" else self.AF
                     self.STDEV_LEN = float(info_val) if info_key == "STDEV_LEN" else self.STDEV_LEN
