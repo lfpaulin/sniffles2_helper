@@ -1,2 +1,5 @@
 __pycache__
 __pycache__/
+.rsync-ignore
+deployScriptsBaylor.sh
+resultadoRsync.txt
