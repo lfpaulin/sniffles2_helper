@@ -21,6 +21,8 @@ def get_arguments():
                             none | ...
             cancer      Parse information of Sniffles2 population merge result
                             none | ...
+            mosaic      Parse information of Sniffles2 mosaic calls
+                            none | ...
 
         # Version
             version    Shows current version/build
@@ -46,9 +48,11 @@ def get_arguments():
                                       help='Min. read support for the SV calls, default = 1')
     subparser_genotypesv.add_argument('-s', '--min-size', type=int, required=False, dest='minsize', default=1,
                                       help='Min. SV size, default = 1, in case of BND this is skipped')
-    subparser_genotypesv.add_argument('-f', '--filter', type=str, required=False, dest='filer_gt', default="",
+    subparser_genotypesv.add_argument('-g', '--genotype-filter', type=str, required=False, dest='filer_gt', default="",
                                       help='Removed genotypes from output, for multiple,need to be comma separated.' +
                                       '\nExample: -f 0/0,0/1, default = None')
+    subparser_genotypesv.add_argument('-f', '--filter', type=str, required=False, dest='filer_by', default="",
+                                      help='')
     subparser_genotypesv.add_argument('-b', '--bed', action='store_true', required=False, dest='as_bed', default=False,
                                       help='')
     subparser_genotypesv.add_argument('-!', '--dev', action='store_true', required=False, dest='as_dev', default=False,
@@ -76,6 +80,11 @@ def get_arguments():
     sniffles2_cancer.add_argument('-g', '--germline',  action='store_true', required=False, dest='tumor_germline', 
                                   default=True, help='Show unique calls only')
     sniffles2_cancer.add_argument('-!', '--dev', action='store_true', required=False, dest='as_dev', default=False, help='')
+
+    # Mosaic
+    sniffles2_mosaic_help = "Mosaic calls"
+    sniffles2_mosaic = subparsers.add_parser("mosaic", help=sniffles2_cancer_help)
+    sniffles2_mosaic.add_argument('-!', '--dev', action='store_true', required=False, dest='as_dev', default=False, help='')
 
     # Survivor
     survivor_help = "Perform analysis on SURVIVOR merges"

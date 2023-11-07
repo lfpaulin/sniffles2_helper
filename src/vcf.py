@@ -173,8 +173,8 @@ class VCFLineSVPopulation(object):
             self.STDEV_POS = -1
             self.RNAMES = []
             self.SUPPORT_LONG = 0
-            self.AF = "NA"
             self.SUPP_VEC = ""
+            self.SUPP_VEC_REPORTED = ""
             self.N_SUPP_VEC = 0
             self.SUPP_VEC_BOOL_LIST = []
             # for FORMAT -> get_genotype()
@@ -187,11 +187,15 @@ class VCFLineSVPopulation(object):
             self.sample_mosaic_status = []
             self.samples_obj = []
             # extract INFO and FORMAT
+            self.set_af()
             self.get_parsed_info(INFO)
             self.get_genotype(FORMAT, sample_header_names)
             # post-procesign
             self.TRA = "" if self.SVTYPE != "BND" else ALT
             self.SVLEN = int(self.SVLEN) if self.SVTYPE != "BND" else 1
+            self.SUPP_VEC_LIST = [int(s) for s in list(self.SUPP_VEC)]
+            self.update_suppvec()
+            self.N_SUPP_VEC = sum([int(s) for s in self.SUPP_VEC_LIST]) if self.SUPP_VEC != "" else 0
             self.END = int(self.END) if self.SVTYPE != "BND" else self.POS+1
 
     def get_parsed_info(self, info_string):
@@ -224,7 +228,7 @@ class VCFLineSVPopulation(object):
                     elif info_key == "SUPPORT_LONG":
                         self.SUPPORT_LONG = int(info_val)
                     elif info_key == "SUPP_VEC":
-                        self.SUPP_VEC = info_val
+                        self.SUPP_VEC_REPORTED = info_val
                         self.SUPP_VEC_BOOL_LIST = [supp == "1" for supp in list(info_val)]
                         self.N_SUPP_VEC = sum([int(supp) for supp in list(info_val)])
                     else:
@@ -265,6 +269,48 @@ class VCFLineSVPopulation(object):
                 sample_gt.set_name(_sample_names[self.SAMPLES.index(each_gt)])
             # Obj
             self.samples_obj.append(sample_gt)
+
+    def set_af(self):
+        self.samples_AF = ["NA"] * len(self.samples_GT)
+        for idx in range(0, len(self.SAMPLES)):
+            dr, dv = int(self.samples_DR[idx]), int(self.samples_DV[idx])
+            try:
+                af = round(dv/float(dr+dv), 3)
+            except ZeroDivisionError:
+                af = numpy.nan
+            self.samples_AF[idx] = af
+
+    def update_suppvec(self):
+        mosaic_min_af = 0.05  # 5%
+        min_reads_sv = 6
+        dev_cause = []
+        dev_out = False
+        if self.SUPP_VEC != "":
+            new_supp_vec = [0] * len(self.SAMPLES)
+            new_sv_id = [""] * len(self.SAMPLES)
+            for sample_index in range(0, len(self.SAMPLES)):
+                gt, af, dr, dv, svid = self.samples_GT[sample_index], self.samples_AF[sample_index], int(self.samples_DV[sample_index]), int(self.samples_DV[sample_index]), self.samples_SV_ID[sample_index]
+                supp = self.SUPP_VEC_LIST[sample_index]
+                # update based on AF
+                if supp == 1 and af < mosaic_min_af:
+                    new_supp_vec[sample_index] = 0
+                    new_sv_id[sample_index] = "NAUPDATE"
+                    dev_cause.append("vaf")
+                elif dr+dv < min_reads_sv:
+                    new_supp_vec[sample_index] = 0
+                    new_sv_id[sample_index] = "NAUPDATE"
+                    dev_cause.append("cov")
+                elif dr+dv > min_reads_sv and gt == "./.":
+                    new_supp_vec[sample_index] = "1"
+                    new_sv_id[sample_index] = svid
+                else:
+                    new_supp_vec[sample_index] = supp
+                    new_sv_id[sample_index] = svid
+            self.SUPP_VEC = "".join([str(s) for s in new_supp_vec])
+            self.SUPP_VEC_LIST = new_supp_vec
+            self.samples_SV_ID = new_sv_id
+            if self.SUPP_VEC_REPORTED != self.SUPP_VEC and dev_out:
+                logger.info(f'{self.SUPP_VEC_REPORTED} v {self.SUPP_VEC} | {self.ID}')
 
 
 # vcf line class for single individuals SV
