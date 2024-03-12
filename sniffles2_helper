@@ -35,6 +35,9 @@ def main():
     # Sniffles2: population
     elif command == "population":
         sniffles2_population(args, sys.stdin, logger)
+    # Sniffles2: mendelian trio
+    elif command == "population":
+        sniffles2_trio(args, sys.stdin, logger)
     # Sniffles2: cancer
     elif command == "cancer":
         sniffles2_cancer(args, sys.stdin, logger)

@@ -76,6 +76,10 @@ def sniffles2_population(args, stdin, logger):
     parse_pop_vcf()
 
 
+def sniffles2_trio(args, stdin, logger):
+    pass
+
+
 def sniffles2_cancer():
     pass
 
